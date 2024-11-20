@@ -195,7 +195,7 @@ const App = () => {
   return (
     <div className="container mx-auto p-4">
       <div>
-        <h1 className="text-2xl font-bold mb-4">
+        <h1 className="text-2xl font-bold mb-4 text-[#0E9046]">
           PhilRice List of Participant
         </h1>
       </div>
@@ -230,17 +230,19 @@ const App = () => {
       </form>
 
       <table className="min-w-full bg-white border border-gray-300">
-        <thead>
+        <thead className="bg-gray-200">
           <tr>
             {[
-              "ID",
-              "Email",
-              "Full Name",
-              "Phil Rice Employee",
-              "Participant Type",
-              "Actions",
-            ].map((header) => (
-              <th key={header} className="py-3 px-4 border-b border-gray-200">
+              { header: "ID", width: "w-16" },
+              { header: "Email", width: "w-48" },
+              { header: "Full Name", width: "w-64" },
+              { header: "Phil Rice Employee", width: "w-40" },
+              { header: "Participant Type", width: "w-40" },
+              { header: "Actions", width: "w-32" },
+            ].map(({ header, width }) => (
+              <th
+                key={header}
+                className={`${width} text-[#0E9046] px-4 py-3 text-left border-b border-gray-200`}>
                 {header}
               </th>
             ))}
@@ -248,20 +250,24 @@ const App = () => {
         </thead>
 
         <tbody>
-          {filteredEmployees.map((employee) => (
-            <tr key={employee.key}>
+          {filteredEmployees.map((employee, index) => (
+            <tr
+              key={employee.key}
+              className={index % 2 === 0 ? "bg-gray-50" : ""}>
               {[
-                employee.id,
-                employee.email,
-                employee.fullName,
-                employee.philriceEmployee,
-                employee.participantType,
-              ].map((data, index) => (
-                <td key={index} className="py-2 px-4 border-b border-gray-200">
+                { data: employee.id, width: "w-16" },
+                { data: employee.email, width: "w-48" },
+                { data: employee.fullName, width: "w-64" },
+                { data: employee.philriceEmployee, width: "w-40" },
+                { data: employee.participantType, width: "w-40" },
+              ].map(({ data, width }, cellIndex) => (
+                <td
+                  key={cellIndex}
+                  className={`${width} py-2 px-4 border-b border-gray-200`}>
                   {data || ""}
                 </td>
               ))}
-              <td className="py-2 px-4 border-b border-gray-200">
+              <td className="py-2 px-4 border-b border-gray-200 w-32">
                 <button
                   onClick={() => handleEdit(employee)}
                   className="mr-2 p-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">
