@@ -212,19 +212,26 @@ const App = () => {
       <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4 mb-6">
         {Object.keys(formData).map((key) =>
           key !== "id" ? (
-            <input
-              key={key}
-              name={key}
-              value={formData[key]}
-              onChange={handleChange}
-              placeholder={key.replace(/([A-Z])/g, " $1").trim()}
-              className="p-2 border border-gray-300 rounded"
-            />
+            <div key={key} className="flex flex-col">
+              <label
+                htmlFor={key}
+                className="text-sm font-medium text-[#0E9046] mb-1">
+                {key.replace(/([A-Z])/g, " $1").trim()}
+              </label>
+              <input
+                id={key}
+                name={key}
+                value={formData[key]}
+                onChange={handleChange}
+                placeholder={`Enter ${key.replace(/([A-Z])/g, " $1").trim()}`} // User-friendly placeholder
+                className="p-2 border border-gray-300 rounded"
+              />
+            </div>
           ) : null
         )}
         <button
           type="submit"
-          className="col-span-2 p-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+          className="col-span-2 p-2 bg-[#0E9046] text-white rounded">
           {formData.key ? "Update Employee" : "Add Employee"}
         </button>
       </form>
