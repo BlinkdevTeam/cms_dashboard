@@ -12,6 +12,7 @@ import {
   orderByChild,
   limitToLast,
 } from "firebase/database";
+import "./loader.css";
 
 const App = () => {
   const firebaseConfig = {
@@ -32,17 +33,17 @@ const App = () => {
   const [formData, setFormData] = useState({
     id: "",
     email: "",
-    philriceEmployee: "",
     participantType: "",
-    firstNameColumn: "",
+    firstName: "",
+    philriceEmployee: "",
     middleName: "",
-    lastNameColumn: "",
+    philricePosition: "",
+    lastName: "",
+    philriceStation: "",
     fullName: "",
+    philriceUnit: "",
     extName: "",
     philriceName: "",
-    philriceStation: "",
-    philriceUnit: "",
-    philricePosition: "",
     affiliationName: "",
     affiliationAddress: "",
     affiliationRegion: "",
@@ -51,6 +52,7 @@ const App = () => {
   const [employees, setEmployees] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredEmployees, setFilteredEmployees] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const employeesRef = ref(database, "users/");
@@ -110,6 +112,7 @@ const App = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setLoading(true);
 
     if (formData.key) {
       // Update existing employee logic
@@ -145,7 +148,12 @@ const App = () => {
             affiliationRegion: "",
           });
         })
-        .catch((error) => console.error("Error updating user:", error));
+        .catch((error) => {
+          console.error("Error updating user:", error);
+        })
+        .finally(() => {
+          setLoading(false); // Hide loader after the update process
+        });
     } else {
       // Add new employee logic
       const newEmployeeRef = push(ref(database, "users"));
@@ -172,7 +180,12 @@ const App = () => {
             affiliationRegion: "",
           });
         })
-        .catch((error) => console.error("Error adding user:", error));
+        .catch((error) => {
+          console.error("Error adding user:", error);
+        })
+        .finally(() => {
+          setLoading(false); // Hide loader after the add process
+        });
     }
   };
 
@@ -206,14 +219,30 @@ const App = () => {
         </h1>
       </div>
 
-      {/* Search Bar */}
-      <input
-        type="text"
-        value={searchTerm}
-        onChange={handleSearch}
-        placeholder="Search employees..."
-        className="p-2 border border-gray-300 rounded mb-6 w-full"
-      />
+      <div className="mb-4">
+        <div className="text-red-500 font-bold text-lg">
+          Form Completion Instructions:
+        </div>
+        <ul className="list-disc pl-5 italic">
+          <li>Please ensure all fields in the form are completed.</li>
+          <li>
+            If a field does not apply to your situation, write{" "}
+            <span className="text-green-600">"N/A"</span> (Not Applicable) in
+            the space provided.
+          </li>
+          <li>
+            Double-check your responses before submitting to avoid delays in
+            processing.
+          </li>
+        </ul>
+      </div>
+
+      {/* Loader */}
+      {loading && (
+        <div className="fixed inset-0 flex items-center justify-center bg-opacity-50 bg-gray-800 z-50">
+          <div className="loader"></div>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4 mb-6">
         {Object.keys(formData).map((key) =>
@@ -236,11 +265,39 @@ const App = () => {
           ) : null
         )}
         <button
+          onClick={() => {
+            window.location.reload();
+          }}
           type="submit"
-          className="col-span-2 p-2 bg-[#0E9046] text-white rounded">
+          disabled={
+            !Object.keys(formData).every((key) =>
+              key === "id" ? true : formData[key].trim() !== ""
+            )
+          } // Disable if any field is empty
+          className={`col-span-2 p-2 rounded text-white ${
+            Object.keys(formData).every((key) =>
+              key === "id" ? true : formData[key].trim() !== ""
+            )
+              ? "bg-[#0E9046]" // Enabled state
+              : "bg-gray-400 cursor-not-allowed" // Disabled state
+          }`}>
           {formData.key ? "Update Employee" : "Add Employee"}
         </button>
       </form>
+
+      {/* Search Bar */}
+      <div className="mt-12 mb-6 w-full flex flex-col">
+        <span className="text-2xl font-bold mb-4 text-[#0E9046] italic">
+          Search here
+        </span>
+        <input
+          type="text"
+          value={searchTerm}
+          onChange={handleSearch}
+          placeholder="Search employees..."
+          className="p-2 border-[2px] border-gray-400 rounded"
+        />
+      </div>
 
       <table className="min-w-full bg-white border border-gray-300">
         <thead className="bg-gray-200">
@@ -289,11 +346,11 @@ const App = () => {
                   className="mr-2 p-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">
                   Edit
                 </button>
-                <button
+                {/* <button
                   onClick={() => handleDelete(employee.key)}
                   className="p-2 bg-red-500 text-white rounded hover:bg-red-600">
                   Delete
-                </button>
+                </button> */}
               </td>
             </tr>
           ))}
