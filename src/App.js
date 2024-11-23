@@ -14,7 +14,6 @@ import {
 } from "firebase/database";
 
 const App = () => {
-  // Initialize Firebase
   const firebaseConfig = {
     apiKey: "AIzaSyC1id1bulVq3lLUJhkzaNBKH363gp4WqEc",
     authDomain: "philricescannerapp.firebaseapp.com",
@@ -50,8 +49,8 @@ const App = () => {
   });
 
   const [employees, setEmployees] = useState([]);
-  const [searchTerm, setSearchTerm] = useState(""); // Search term state
-  const [filteredEmployees, setFilteredEmployees] = useState([]); // Filtered employees
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredEmployees, setFilteredEmployees] = useState([]);
 
   useEffect(() => {
     const employeesRef = ref(database, "users/");
@@ -59,11 +58,11 @@ const App = () => {
       const data = snapshot.val();
       if (data) {
         const formattedData = Object.keys(data).map((key) => ({
-          key, // Store the Firebase key for operations like delete
-          ...data[key], // Include all other fields (e.g., id, email, etc.)
+          key,
+          ...data[key],
         }));
         setEmployees(formattedData);
-        setFilteredEmployees(formattedData); // Initialize the filtered list
+        setFilteredEmployees(formattedData);
       }
     });
   }, []);
@@ -87,7 +86,7 @@ const App = () => {
         }));
       }
     });
-  }, [employees]); // Run this effect when employees list changes
+  }, [employees]);
 
   // Handle search functionality
   useEffect(() => {
@@ -192,6 +191,13 @@ const App = () => {
       .catch((error) => console.error("Error deleting user:", error));
   };
 
+  const handleScrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth", // This adds a smooth scrolling animation
+    });
+  };
+
   return (
     <div className="container mx-auto p-4">
       <div>
@@ -276,7 +282,10 @@ const App = () => {
               ))}
               <td className="py-2 px-4 border-b border-gray-200 w-32">
                 <button
-                  onClick={() => handleEdit(employee)}
+                  onClick={() => {
+                    handleEdit(employee);
+                    handleScrollToTop();
+                  }}
                   className="mr-2 p-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">
                   Edit
                 </button>
