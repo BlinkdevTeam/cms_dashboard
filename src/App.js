@@ -43,11 +43,36 @@ const App = () => {
     fullName: "",
     philriceUnit: "",
     extName: "",
-    philriceName: "",
+    philriceName: "Philippine Rice Research Institute",
     affiliationName: "",
     affiliationAddress: "",
     affiliationRegion: "",
   });
+
+  const placeholderMap = {
+    email: "Enter your email",
+    participantType: "Enter participant type (Presenter or Participant)",
+    firstName: "Enter your first name",
+    philriceEmployee: "Are you a PhilRice employee? (Yes / No)",
+    middleName: "Enter your middle name",
+    philricePosition: "Enter your PhilRice position",
+    lastName: "Enter your last name",
+    philriceStation: "Enter your PhilRice station",
+    fullName: "Full name will be auto-generated",
+    philriceUnit: "Enter your PhilRice unit",
+    extName: "Enter your extension name, if any",
+    philriceName: "Enter your PhilRice name",
+    affiliationName: "Enter your affiliation name",
+    affiliationAddress: "Enter your affiliation address",
+    affiliationRegion: "Enter your affiliation region",
+  };
+
+  useEffect(() => {
+    setFormData((prevData) => ({
+      ...prevData,
+      fullName: `${prevData.firstName} ${prevData.lastName}`.trim(),
+    }));
+  }, [formData.firstName, formData.lastName]);
 
   const [employees, setEmployees] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -245,25 +270,56 @@ const App = () => {
       )}
 
       <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4 mb-6">
-        {Object.keys(formData).map((key) =>
-          key !== "id" ? (
+        {Object.keys(formData).map((key) => {
+          if (key === "id") return null; // Skip the id field
+
+          return (
             <div key={key} className="flex flex-col">
               <label
                 htmlFor={key}
                 className="text-sm font-medium text-[#0E9046] mb-1">
                 {key.replace(/([A-Z])/g, " $1").trim()}
               </label>
-              <input
-                id={key}
-                name={key}
-                value={formData[key]}
-                onChange={handleChange}
-                placeholder={`Enter ${key.replace(/([A-Z])/g, " $1").trim()}`} // User-friendly placeholder
-                className="p-2 border border-gray-300 rounded"
-              />
+
+              {/* Dropdown for philriceEmployee */}
+              {key === "philriceEmployee" ? (
+                <select
+                  id={key}
+                  name={key}
+                  value={formData[key]}
+                  onChange={handleChange}
+                  className="p-2 border border-gray-300 rounded">
+                  <option value="">Select employee type</option>
+                  <option value="PhilRice">PhilRice</option>
+                  <option value="External">External</option>
+                </select>
+              ) : /* Dropdown for participantType */
+              key === "participantType" ? (
+                <select
+                  id={key}
+                  name={key}
+                  value={formData[key]}
+                  onChange={handleChange}
+                  className="p-2 border border-gray-300 rounded">
+                  <option value="">Select participant type</option>
+                  <option value="Participant">Participant</option>
+                  <option value="Presenter">Presenter</option>
+                </select>
+              ) : (
+                // Render input for other fields
+                <input
+                  id={key}
+                  name={key}
+                  value={formData[key]}
+                  onChange={handleChange}
+                  placeholder={placeholderMap[key] || `Enter ${key}`}
+                  className="p-2 border border-gray-300 rounded"
+                />
+              )}
             </div>
-          ) : null
-        )}
+          );
+        })}
+
         <button
           onClick={() => {
             window.location.reload();
@@ -288,14 +344,14 @@ const App = () => {
       {/* Search Bar */}
       <div className="mt-12 mb-6 w-full flex flex-col">
         <span className="text-2xl font-bold mb-4 text-[#0E9046] italic">
-          Search here
+          Search here...
         </span>
         <input
           type="text"
           value={searchTerm}
           onChange={handleSearch}
           placeholder="Search employees..."
-          className="p-2 border-[2px] border-gray-400 rounded"
+          className="p-2 border-[2px] border-gray-400 rounded w-4/12"
         />
       </div>
 
