@@ -244,7 +244,7 @@ const App = () => {
         </h1>
       </div>
 
-      <div className="mb-4">
+      <div className="my-4">
         <div className="text-red-500 font-bold text-lg">
           Form Completion Instructions:
         </div>
