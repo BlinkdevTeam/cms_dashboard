@@ -212,9 +212,9 @@ const App = () => {
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <div>
-        <h1 className="text-2xl font-bold mb-4 text-[#0E9046]">
+    <div className="container-full px-8 mx-auto p-4">
+      <div className="w-full flex justify-center items-center py-4 px-8 bg-[#0E9046]">
+        <h1 className="text-4xl font-bold text-white">
           PhilRice List of Participant
         </h1>
       </div>
