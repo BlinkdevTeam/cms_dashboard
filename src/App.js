@@ -106,10 +106,10 @@ const App = () => {
       const data = snapshot.val();
       if (data) {
         const lastEmployee = Object.values(data)[0];
-        const lastId = lastEmployee.id || 0; // If no ID, start from 0
+        const lastId = lastEmployee.id || 0;
         setFormData((prevData) => ({
           ...prevData,
-          id: lastId + 1, // Generate the new ID
+          id: lastId + 1,
         }));
       }
     });
@@ -144,9 +144,9 @@ const App = () => {
       const updateData = Object.fromEntries(
         Object.entries(formData).filter(([key, value]) => {
           if (typeof value === "string") {
-            return value.trim() !== ""; // Only trim strings
+            return value.trim() !== "";
           }
-          return value !== null && value !== undefined; // Include non-string, non-null, non-undefined values
+          return value !== null && value !== undefined;
         })
       );
 
@@ -157,17 +157,17 @@ const App = () => {
           setFormData({
             id: "",
             email: "",
-            philriceEmployee: "",
             participantType: "",
-            firstNameColumn: "",
+            firstName: "",
+            philriceEmployee: "",
             middleName: "",
-            lastNameColumn: "",
-            fullName: "",
-            extName: "",
-            philriceName: "",
-            philriceStation: "",
-            philriceUnit: "",
             philricePosition: "",
+            lastName: "",
+            philriceStation: "",
+            fullName: "",
+            philriceUnit: "",
+            extName: "",
+            philriceName: "Philippine Rice Research Institute",
             affiliationName: "",
             affiliationAddress: "",
             affiliationRegion: "",
@@ -177,7 +177,7 @@ const App = () => {
           console.error("Error updating user:", error);
         })
         .finally(() => {
-          setLoading(false); // Hide loader after the update process
+          setLoading(false);
         });
     } else {
       // Add new employee logic
@@ -189,17 +189,17 @@ const App = () => {
           setFormData({
             id: "",
             email: "",
-            philriceEmployee: "",
             participantType: "",
-            firstNameColumn: "",
+            firstName: "",
+            philriceEmployee: "",
             middleName: "",
-            lastNameColumn: "",
-            fullName: "",
-            extName: "",
-            philriceName: "",
-            philriceStation: "",
-            philriceUnit: "",
             philricePosition: "",
+            lastName: "",
+            philriceStation: "",
+            fullName: "",
+            philriceUnit: "",
+            extName: "",
+            philriceName: "Philippine Rice Research Institute",
             affiliationName: "",
             affiliationAddress: "",
             affiliationRegion: "",
@@ -209,13 +209,13 @@ const App = () => {
           console.error("Error adding user:", error);
         })
         .finally(() => {
-          setLoading(false); // Hide loader after the add process
+          setLoading(false);
         });
     }
   };
 
   const handleEdit = (employee) => {
-    setFormData(employee); // Set the entire employee object, including the Firebase key
+    setFormData(employee);
   };
 
   const handleDelete = (key) => {
@@ -232,7 +232,7 @@ const App = () => {
   const handleScrollToTop = () => {
     window.scrollTo({
       top: 0,
-      behavior: "smooth", // This adds a smooth scrolling animation
+      behavior: "smooth",
     });
   };
 
@@ -262,7 +262,6 @@ const App = () => {
         </ul>
       </div>
 
-      {/* Loader */}
       {loading && (
         <div className="fixed inset-0 flex items-center justify-center bg-opacity-50 bg-gray-800 z-50">
           <div className="loader"></div>
@@ -271,7 +270,7 @@ const App = () => {
 
       <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4 mb-6">
         {Object.keys(formData).map((key) => {
-          if (key === "id") return null; // Skip the id field
+          if (key === "id") return null;
 
           return (
             <div key={key} className="flex flex-col">
@@ -281,7 +280,6 @@ const App = () => {
                 {key.replace(/([A-Z])/g, " $1").trim()}
               </label>
 
-              {/* Dropdown for philriceEmployee */}
               {key === "philriceEmployee" ? (
                 <select
                   id={key}
@@ -293,8 +291,7 @@ const App = () => {
                   <option value="PhilRice">PhilRice</option>
                   <option value="External">External</option>
                 </select>
-              ) : /* Dropdown for participantType */
-              key === "participantType" ? (
+              ) : key === "participantType" ? (
                 <select
                   id={key}
                   name={key}
@@ -306,7 +303,6 @@ const App = () => {
                   <option value="Presenter">Presenter</option>
                 </select>
               ) : (
-                // Render input for other fields
                 <input
                   id={key}
                   name={key}
@@ -329,13 +325,13 @@ const App = () => {
             !Object.keys(formData).every((key) =>
               key === "id" ? true : formData[key].trim() !== ""
             )
-          } // Disable if any field is empty
+          }
           className={`col-span-2 p-2 rounded text-white ${
             Object.keys(formData).every((key) =>
               key === "id" ? true : formData[key].trim() !== ""
             )
-              ? "bg-[#0E9046]" // Enabled state
-              : "bg-gray-400 cursor-not-allowed" // Disabled state
+              ? "bg-[#0E9046]"
+              : "bg-gray-400 cursor-not-allowed"
           }`}>
           {formData.key ? "Update Employee" : "Add Employee"}
         </button>
