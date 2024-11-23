@@ -346,7 +346,7 @@ const App = () => {
           type="text"
           value={searchTerm}
           onChange={handleSearch}
-          placeholder="Search employees..."
+          placeholder="Search Participants"
           className="p-2 border-[2px] border-gray-400 rounded w-4/12"
         />
       </div>
