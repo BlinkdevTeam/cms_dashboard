@@ -358,7 +358,7 @@ const App = () => {
               { header: "ID", width: "w-16" },
               { header: "Email", width: "w-48" },
               { header: "Full Name", width: "w-64" },
-              { header: "Phil Rice Employee", width: "w-40" },
+              { header: "PhilRice Employee", width: "w-40" },
               { header: "Participant Type", width: "w-40" },
               { header: "Time Arrival", width: "w-40" },
               { header: "Actions", width: "w-32" },
