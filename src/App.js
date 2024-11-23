@@ -308,6 +308,7 @@ const App = () => {
               { header: "Full Name", width: "w-64" },
               { header: "Phil Rice Employee", width: "w-40" },
               { header: "Participant Type", width: "w-40" },
+              { header: "Time Arrival", width: "w-40" },
               { header: "Actions", width: "w-32" },
             ].map(({ header, width }) => (
               <th
@@ -330,6 +331,7 @@ const App = () => {
                 { data: employee.fullName, width: "w-64" },
                 { data: employee.philriceEmployee, width: "w-40" },
                 { data: employee.participantType, width: "w-40" },
+                { data: employee.timeAttended, width: "w-40" },
               ].map(({ data, width }, cellIndex) => (
                 <td
                   key={cellIndex}
