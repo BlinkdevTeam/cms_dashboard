@@ -78,6 +78,12 @@ const App = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [showLightbox, setShowLightbox] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [showEditLightbox, setShowEditLightbox] = useState(false);
+
+  const [showAddLightbox, setShowAddLightbox] = useState(false);
+  const [showUpdateLightbox, setShowUpdateLightbox] = useState(false);
 
   useEffect(() => {
     const employeesRef = ref(database, "users/");
@@ -94,26 +100,24 @@ const App = () => {
     });
   }, []);
 
-  // Generate employee ID based on the last ID
-  useEffect(() => {
-    const lastEmployeeRef = query(
-      ref(database, "users/"),
-      orderByChild("id"),
-      limitToLast(1)
-    );
+  function generateRandomId(length = 8) {
+    const characters =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let randomId = "";
+    for (let i = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * characters.length);
+      randomId += characters[randomIndex];
+    }
+    return randomId;
+  }
 
-    onValue(lastEmployeeRef, (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        const lastEmployee = Object.values(data)[0];
-        const lastId = lastEmployee.id || 0;
-        setFormData((prevData) => ({
-          ...prevData,
-          id: lastId + 1,
-        }));
-      }
-    });
-  }, [employees]);
+  // Fetch and set the random ID when the form loads
+  useEffect(() => {
+    setFormData((prevData) => ({
+      ...prevData,
+      id: generateRandomId(10), // Use 10-character random ID, adjust length if needed
+    }));
+  }, []); // Empty dependency array to ensure this runs only once when the component mounts
 
   // Handle search functionality
   useEffect(() => {
@@ -137,85 +141,34 @@ const App = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setLoading(true);
 
-    if (formData.key) {
-      // Update existing employee logic
-      const updateData = Object.fromEntries(
-        Object.entries(formData).filter(([key, value]) => {
-          if (typeof value === "string") {
-            return value.trim() !== "";
-          }
-          return value !== null && value !== undefined;
-        })
-      );
-
-      update(ref(database, `users/${formData.key}`), updateData)
-        .then(() => {
-          console.log("Updated successfully");
-          // Reset the form after updating
-          setFormData({
-            id: "",
-            email: "",
-            participantType: "",
-            firstName: "",
-            philriceEmployee: "",
-            middleName: "",
-            philricePosition: "",
-            lastName: "",
-            philriceStation: "",
-            fullName: "",
-            philriceUnit: "",
-            extName: "",
-            philriceName: "Philippine Rice Research Institute",
-            affiliationName: "",
-            affiliationAddress: "",
-            affiliationRegion: "",
-          });
-        })
-        .catch((error) => {
-          console.error("Error updating user:", error);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    } else {
-      // Add new employee logic
-      const newEmployeeRef = push(ref(database, "users"));
-      set(newEmployeeRef, formData)
-        .then(() => {
-          console.log("Added successfully");
-          // Reset the form after adding
-          setFormData({
-            id: "",
-            email: "",
-            participantType: "",
-            firstName: "",
-            philriceEmployee: "",
-            middleName: "",
-            philricePosition: "",
-            lastName: "",
-            philriceStation: "",
-            fullName: "",
-            philriceUnit: "",
-            extName: "",
-            philriceName: "Philippine Rice Research Institute",
-            affiliationName: "",
-            affiliationAddress: "",
-            affiliationRegion: "",
-          });
-        })
-        .catch((error) => {
-          console.error("Error adding user:", error);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
+    // Ensure that the ID is generated before showing the confirmation lightbox
+    if (!formData.id) {
+      setFormData((prevData) => ({
+        ...prevData,
+        id: generateRandomId(10), // Generate a new ID if not already set
+      }));
     }
+
+    formData.key ? setShowUpdateLightbox(true) : setShowAddLightbox(true);
   };
 
   const handleEdit = (employee) => {
-    setFormData(employee);
+    setSelectedEmployee(employee); // Store the selected employee
+    setShowEditLightbox(true); // Open the edit confirmation lightbox
+  };
+
+  const confirmEdit = () => {
+    if (!selectedEmployee) {
+      console.error("No employee selected for editing.");
+      alert("Unable to edit. Invalid participant data.");
+      setShowEditLightbox(false);
+      return;
+    }
+
+    setFormData(selectedEmployee); // Set the form data for editing
+    setShowEditLightbox(false); // Close the lightbox
+    handleScrollToTop(); // Scroll to the top of the form
   };
 
   const handleDelete = (key) => {
@@ -233,6 +186,102 @@ const App = () => {
     window.scrollTo({
       top: 0,
       behavior: "smooth",
+    });
+  };
+
+  const handleMarkAsAttend = (employee) => {
+    setSelectedEmployee(employee);
+    setShowLightbox(true);
+  };
+
+  const confirmMarkAttendance = () => {
+    if (!selectedEmployee?.key) {
+      console.error("Invalid participant key.");
+      alert("Unable to mark attendance. Invalid participant data.");
+      setShowLightbox(false);
+      return;
+    }
+
+    const dateTimeNow = new Date().toLocaleString();
+
+    const updates = {
+      attendanceCheck: "Attend",
+      timeAttended: dateTimeNow,
+    };
+
+    update(ref(database, `users/${selectedEmployee.key}`), updates)
+      .then(() => {
+        console.log(
+          `Marked as attended for participant with key: ${selectedEmployee.key}`
+        );
+        // alert("Participant attendance marked successfully!");
+      })
+      .catch((error) => {
+        console.error("Error marking attendance:", error);
+        alert("Failed to mark attendance. Please try again.");
+      })
+      .finally(() => {
+        setShowLightbox(false);
+        setSelectedEmployee(null);
+      });
+  };
+
+  const addParticipant = () => {
+    setLoading(true);
+
+    // Generate a new random ID before adding the participant
+    const newId = generateRandomId(10); // Generate a new ID
+
+    const newEmployeeRef = push(ref(database, "users"));
+    set(newEmployeeRef, { ...formData, id: newId }) // Include the new ID in the form data
+      .then(() => {
+        console.log("Added successfully");
+        resetForm();
+      })
+      .catch((error) => console.error("Error adding user:", error))
+      .finally(() => setLoading(false));
+  };
+
+  const updateParticipant = () => {
+    setLoading(true);
+    const updateData = Object.fromEntries(
+      Object.entries(formData).filter(([key, value]) => {
+        // Check if value is a string before calling trim
+        if (typeof value === "string") {
+          return value.trim() !== "";
+        }
+        // If value is not a string, include it only if it's truthy
+        return Boolean(value);
+      })
+    );
+
+    update(ref(database, `users/${formData.key}`), updateData)
+      .then(() => {
+        console.log("Updated successfully");
+        resetForm();
+      })
+      .catch((error) => console.error("Error updating user:", error))
+      .finally(() => setLoading(false));
+  };
+
+  const resetForm = () => {
+    setFormData({
+      id: "",
+      email: "",
+      participantType: "",
+      firstName: "",
+      philriceEmployee: "",
+      middleName: "",
+      philricePosition: "",
+      lastName: "",
+      philriceStation: "",
+      fullName: "",
+      philriceUnit: "",
+      extName: "",
+      philriceName: "Philippine Rice Research Institute",
+      affiliationName: "",
+      affiliationAddress: "",
+      affiliationRegion: "",
     });
   };
 
@@ -317,10 +366,7 @@ const App = () => {
         })}
 
         <button
-          onClick={() => {
-            window.location.reload();
-          }}
-          type="submit"
+          type="button"
           disabled={
             !Object.keys(formData).every((key) =>
               key === "id" ? true : formData[key].trim() !== ""
@@ -332,7 +378,8 @@ const App = () => {
             )
               ? "bg-[#0E9046]"
               : "bg-gray-400 cursor-not-allowed"
-          }`}>
+          }`}
+          onClick={handleSubmit}>
           {formData.key ? "Update Employee" : "Add Employee"}
         </button>
       </form>
@@ -391,7 +438,7 @@ const App = () => {
                   {data || ""}
                 </td>
               ))}
-              <td className="py-2 px-4 border-b border-gray-200 w-32">
+              <td className="py-2 px-4 border-b border-gray-200 w-32 flex gap-1">
                 <button
                   onClick={() => {
                     handleEdit(employee);
@@ -405,11 +452,117 @@ const App = () => {
                   className="p-2 bg-red-500 text-white rounded hover:bg-red-600">
                   Delete
                 </button> */}
+                <button
+                  onClick={() => handleMarkAsAttend(employee)}
+                  className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                  Mark as Attend
+                </button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+      {showEditLightbox && (
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded shadow-lg w-1/3">
+            <h2 className="text-xl font-bold mb-4">Confirm Edit</h2>
+            <p>
+              Are you sure you want to edit the details of{" "}
+              <span className="font-semibold">
+                {selectedEmployee?.fullName}
+              </span>
+              ?
+            </p>
+            <div className="mt-6 flex justify-end gap-4">
+              <button
+                onClick={() => setShowEditLightbox(false)}
+                className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500">
+                Cancel
+              </button>
+              <button
+                onClick={() => confirmEdit()}
+                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showLightbox && (
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded shadow-lg w-1/3">
+            <h2 className="text-xl font-bold mb-4">Confirm Attendance</h2>
+            <p>
+              Are you sure you want to mark attendance for{" "}
+              <span className="font-semibold">
+                {selectedEmployee?.fullName}
+              </span>
+              ?
+            </p>
+            <div className="mt-6 flex justify-end gap-4">
+              <button
+                onClick={() => setShowLightbox(false)}
+                className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500">
+                Cancel
+              </button>
+              <button
+                onClick={() => confirmMarkAttendance()}
+                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showAddLightbox && (
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded shadow-lg w-1/3">
+            <h2 className="text-xl font-bold mb-4">Confirm Add</h2>
+            <p>Are you sure you want to add this participant?</p>
+            <div className="mt-6 flex justify-end gap-4">
+              <button
+                onClick={() => setShowAddLightbox(false)}
+                className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500">
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  setShowAddLightbox(false);
+                  addParticipant();
+                }}
+                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showUpdateLightbox && (
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded shadow-lg w-1/3">
+            <h2 className="text-xl font-bold mb-4">Confirm Update</h2>
+            <p>Are you sure you want to update this participant's details?</p>
+            <div className="mt-6 flex justify-end gap-4">
+              <button
+                onClick={() => setShowUpdateLightbox(false)}
+                className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500">
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  setShowUpdateLightbox(false);
+                  updateParticipant();
+                }}
+                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
