@@ -85,6 +85,9 @@ const App = () => {
   const [showAddLightbox, setShowAddLightbox] = useState(false);
   const [showUpdateLightbox, setShowUpdateLightbox] = useState(false);
 
+  //new code
+  const [selectedDay, setSelectedDay] = useState("");
+
   useEffect(() => {
     const employeesRef = ref(database, "users/");
     onValue(employeesRef, (snapshot) => {
@@ -195,26 +198,27 @@ const App = () => {
   };
 
   const confirmMarkAttendance = () => {
-    if (!selectedEmployee?.key) {
-      console.error("Invalid participant key.");
-      alert("Unable to mark attendance. Invalid participant data.");
+    if (!selectedEmployee?.key || !selectedDay) {
+      console.error("Invalid participant key or day selection.");
+      alert("Unable to mark attendance. Please select a day.");
       setShowLightbox(false);
       return;
     }
 
     const dateTimeNow = new Date().toLocaleString();
 
+    // Updates based on the selected day
     const updates = {
+      [`day${selectedDay}timeAttended`]: dateTimeNow, // Dynamically update the selected day
       attendanceCheck: "Attend",
-      timeAttended: dateTimeNow,
     };
 
     update(ref(database, `users/${selectedEmployee.key}`), updates)
       .then(() => {
         console.log(
-          `Marked as attended for participant with key: ${selectedEmployee.key}`
+          `Marked as attended for day ${selectedDay} for participant with key: ${selectedEmployee.key}`
         );
-        // alert("Participant attendance marked successfully!");
+        // Optionally, alert the user or trigger another action after success
       })
       .catch((error) => {
         console.error("Error marking attendance:", error);
@@ -223,6 +227,7 @@ const App = () => {
       .finally(() => {
         setShowLightbox(false);
         setSelectedEmployee(null);
+        setSelectedDay(""); // Reset the selected day
       });
   };
 
@@ -380,7 +385,7 @@ const App = () => {
               : "bg-gray-400 cursor-not-allowed"
           }`}
           onClick={handleSubmit}>
-          {formData.key ? "Update Employee" : "Add Employee"}
+          {formData.key ? "Update Participant" : "Add Participant"}
         </button>
       </form>
 
@@ -407,7 +412,10 @@ const App = () => {
               { header: "Full Name", width: "w-64" },
               { header: "PhilRice Employee", width: "w-40" },
               { header: "Participant Type", width: "w-40" },
-              { header: "Time Arrival", width: "w-40" },
+              { header: "Day 1", width: "w-32" },
+              { header: "Day 2", width: "w-32" },
+              { header: "Day 3", width: "w-32" },
+              { header: "Day 4", width: "w-32" },
               { header: "Actions", width: "w-32" },
             ].map(({ header, width }) => (
               <th
@@ -430,12 +438,15 @@ const App = () => {
                 { data: employee.fullName, width: "w-64" },
                 { data: employee.philriceEmployee, width: "w-40" },
                 { data: employee.participantType, width: "w-40" },
-                { data: employee.timeAttended, width: "w-40" },
+                { data: employee.day1timeAttended || "", width: "w-32" },
+                { data: employee.day2timeAttended || "", width: "w-32" },
+                { data: employee.day3timeAttended || "", width: "w-32" },
+                { data: employee.day4timeAttended || "", width: "w-32" },
               ].map(({ data, width }, cellIndex) => (
                 <td
                   key={cellIndex}
                   className={`${width} py-2 px-4 border-b border-gray-200`}>
-                  {data || ""}
+                  {data || "Not Attended"}
                 </td>
               ))}
               <td className="py-2 px-4 border-b border-gray-200 w-32 flex gap-1">
@@ -448,10 +459,10 @@ const App = () => {
                   Edit
                 </button>
                 {/* <button
-                  onClick={() => handleDelete(employee.key)}
-                  className="p-2 bg-red-500 text-white rounded hover:bg-red-600">
-                  Delete
-                </button> */}
+            onClick={() => handleDelete(employee.key)}
+            className="p-2 bg-red-500 text-white rounded hover:bg-red-600">
+            Delete
+          </button> */}
                 <button
                   onClick={() => handleMarkAsAttend(employee)}
                   className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600">
@@ -462,6 +473,7 @@ const App = () => {
           ))}
         </tbody>
       </table>
+
       {showEditLightbox && (
         <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded shadow-lg w-1/3">
@@ -500,6 +512,27 @@ const App = () => {
               </span>
               ?
             </p>
+
+            {/* Day selection dropdown */}
+            <div className="mt-4">
+              <label
+                htmlFor="attendanceDay"
+                className="block text-sm font-medium text-gray-700">
+                Select Day to Mark Attendance
+              </label>
+              <select
+                id="attendanceDay"
+                value={selectedDay}
+                onChange={(e) => setSelectedDay(e.target.value)}
+                className="p-2 mt-2 border border-gray-300 rounded">
+                <option value="">Select Day</option>
+                <option value="1">Day 1</option>
+                <option value="2">Day 2</option>
+                <option value="3">Day 3</option>
+                <option value="4">Day 4</option>
+              </select>
+            </div>
+
             <div className="mt-6 flex justify-end gap-4">
               <button
                 onClick={() => setShowLightbox(false)}
