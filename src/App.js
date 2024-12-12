@@ -330,7 +330,8 @@ const App = () => {
             <div key={key} className="flex flex-col">
               <label
                 htmlFor={key}
-                className="text-sm font-medium text-[#0E9046] mb-1">
+                className="text-sm font-medium text-[#0E9046] mb-1"
+              >
                 {key.replace(/([A-Z])/g, " $1").trim()}
               </label>
 
@@ -340,7 +341,8 @@ const App = () => {
                   name={key}
                   value={formData[key]}
                   onChange={handleChange}
-                  className="p-2 border border-gray-300 rounded">
+                  className="p-2 border border-gray-300 rounded"
+                >
                   <option value="">Select employee type</option>
                   <option value="PhilRice">PhilRice</option>
                   <option value="External">External</option>
@@ -351,7 +353,8 @@ const App = () => {
                   name={key}
                   value={formData[key]}
                   onChange={handleChange}
-                  className="p-2 border border-gray-300 rounded">
+                  className="p-2 border border-gray-300 rounded"
+                >
                   <option value="">Select participant type</option>
                   <option value="Participant">Participant</option>
                   <option value="Presenter">Presenter</option>
@@ -372,19 +375,9 @@ const App = () => {
 
         <button
           type="button"
-          disabled={
-            !Object.keys(formData).every((key) =>
-              key === "id" ? true : formData[key].trim() !== ""
-            )
-          }
-          className={`col-span-2 p-2 rounded text-white ${
-            Object.keys(formData).every((key) =>
-              key === "id" ? true : formData[key].trim() !== ""
-            )
-              ? "bg-[#0E9046]"
-              : "bg-gray-400 cursor-not-allowed"
-          }`}
-          onClick={handleSubmit}>
+          className="col-span-2 p-2 rounded text-white bg-[#0E9046]"
+          onClick={handleSubmit}
+        >
           {formData.key ? "Update Participant" : "Add Participant"}
         </button>
       </form>
@@ -420,7 +413,8 @@ const App = () => {
             ].map(({ header, width }) => (
               <th
                 key={header}
-                className={`${width} text-[#0E9046] px-4 py-3 text-left border-b border-gray-200`}>
+                className={`${width} text-[#0E9046] px-4 py-3 text-left border-b border-gray-200`}
+              >
                 {header}
               </th>
             ))}
@@ -431,7 +425,8 @@ const App = () => {
           {filteredEmployees.map((employee, index) => (
             <tr
               key={employee.key}
-              className={index % 2 === 0 ? "bg-gray-50" : ""}>
+              className={index % 2 === 0 ? "bg-gray-50" : ""}
+            >
               {[
                 { data: employee.id, width: "w-16" },
                 { data: employee.email, width: "w-48" },
@@ -445,7 +440,8 @@ const App = () => {
               ].map(({ data, width }, cellIndex) => (
                 <td
                   key={cellIndex}
-                  className={`${width} py-2 px-4 border-b border-gray-200`}>
+                  className={`${width} py-2 px-4 border-b border-gray-200`}
+                >
                   {data || "Not Attended"}
                 </td>
               ))}
@@ -455,7 +451,8 @@ const App = () => {
                     handleEdit(employee);
                     handleScrollToTop();
                   }}
-                  className="mr-2 p-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">
+                  className="mr-2 p-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+                >
                   Edit
                 </button>
                 {/* <button
@@ -465,7 +462,8 @@ const App = () => {
           </button> */}
                 <button
                   onClick={() => handleMarkAsAttend(employee)}
-                  className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                  className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                >
                   Mark as Attend
                 </button>
               </td>
@@ -488,12 +486,14 @@ const App = () => {
             <div className="mt-6 flex justify-end gap-4">
               <button
                 onClick={() => setShowEditLightbox(false)}
-                className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500">
+                className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
+              >
                 Cancel
               </button>
               <button
                 onClick={() => confirmEdit()}
-                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+              >
                 Confirm
               </button>
             </div>
@@ -517,14 +517,16 @@ const App = () => {
             <div className="mt-4">
               <label
                 htmlFor="attendanceDay"
-                className="block text-sm font-medium text-gray-700">
+                className="block text-sm font-medium text-gray-700"
+              >
                 Select Day to Mark Attendance
               </label>
               <select
                 id="attendanceDay"
                 value={selectedDay}
                 onChange={(e) => setSelectedDay(e.target.value)}
-                className="p-2 mt-2 border border-gray-300 rounded">
+                className="p-2 mt-2 border border-gray-300 rounded"
+              >
                 <option value="">Select Day</option>
                 <option value="1">Day 1</option>
                 <option value="2">Day 2</option>
@@ -536,12 +538,14 @@ const App = () => {
             <div className="mt-6 flex justify-end gap-4">
               <button
                 onClick={() => setShowLightbox(false)}
-                className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500">
+                className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
+              >
                 Cancel
               </button>
               <button
                 onClick={() => confirmMarkAttendance()}
-                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+              >
                 Confirm
               </button>
             </div>
@@ -557,7 +561,8 @@ const App = () => {
             <div className="mt-6 flex justify-end gap-4">
               <button
                 onClick={() => setShowAddLightbox(false)}
-                className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500">
+                className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
+              >
                 Cancel
               </button>
               <button
@@ -565,7 +570,8 @@ const App = () => {
                   setShowAddLightbox(false);
                   addParticipant();
                 }}
-                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+              >
                 Confirm
               </button>
             </div>
@@ -581,7 +587,8 @@ const App = () => {
             <div className="mt-6 flex justify-end gap-4">
               <button
                 onClick={() => setShowUpdateLightbox(false)}
-                className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500">
+                className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
+              >
                 Cancel
               </button>
               <button
@@ -589,7 +596,8 @@ const App = () => {
                   setShowUpdateLightbox(false);
                   updateParticipant();
                 }}
-                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+              >
                 Confirm
               </button>
             </div>
