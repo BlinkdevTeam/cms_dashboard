@@ -145,7 +145,7 @@ const App = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Ensure that the ID is generated before showing the confirmation lightbox
+    // Ensure the ID is generated
     if (!formData.id) {
       setFormData((prevData) => ({
         ...prevData,
@@ -153,7 +153,15 @@ const App = () => {
       }));
     }
 
-    formData.key ? setShowUpdateLightbox(true) : setShowAddLightbox(true);
+    // Proceed with showing the lightbox
+    if (formData.key) {
+      setShowUpdateLightbox(true);
+    } else {
+      setShowAddLightbox(true);
+    }
+
+    // Perform any additional saving or API logic here
+    console.log("Form Data Saved:", formData);
   };
 
   const handleEdit = (employee) => {
@@ -249,16 +257,9 @@ const App = () => {
 
   const updateParticipant = () => {
     setLoading(true);
-    const updateData = Object.fromEntries(
-      Object.entries(formData).filter(([key, value]) => {
-        // Check if value is a string before calling trim
-        if (typeof value === "string") {
-          return value.trim() !== "";
-        }
-        // If value is not a string, include it only if it's truthy
-        return Boolean(value);
-      })
-    );
+
+    // No filtering of formData; allow blank values to be saved
+    const updateData = { ...formData };
 
     update(ref(database, `users/${formData.key}`), updateData)
       .then(() => {
